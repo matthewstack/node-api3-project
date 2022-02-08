@@ -55,17 +55,6 @@ router.put("/:id", validateUser, validateUserId, (req, res, next) => {
     });
 });
 
-// router.delete("/:id", validateUserId, (req, res, next) => {
-
-//   Users.remove(req.params.id)
-//     .then((user) => {
-//       return res.json(user);
-//     })
-//     .catch((err) => {
-//       next(err);
-//     });
-// });
-
 router.delete("/:id", validateUserId, (req, res, next) => {
   // RETURN THE FRESHLY DELETED USER OBJECT
   // this needs a middleware to verify user id
@@ -90,13 +79,17 @@ router.get("/:id/posts", validateUserId, (req, res, next) => {
     });
 });
 
-router.post("/:id/posts", (req, res, next) => {
+router.post("/:id/posts", validateUserId, validatePost, (req, res, next) => {
   // RETURN THE NEWLY CREATED USER POST
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
-  Posts.get();
-
-  next();
+  Posts.insert({ ...req.body, user_id: req.params.id })
+    .then((post) => {
+      res.json(post);
+    })
+    .catch((err) => {
+      next(err);
+    });
 });
 
 router.use((err, req, res, next) => {
