@@ -1,15 +1,34 @@
+const Users = require("../users/users-model");
+
 function logger(req, res, next) {
   // DO YOUR MAGIC
-  console.log(`[${req.methods}] ${req.url}`);
+  console.log(`[${req.method}] ${req.url}`);
   next();
 }
 
-function validateUserId(req, res, next) {
-  // DO YOUR MAGIC
+async function validateUserId(req, res, next) {
+  const { id } = req.params;
+  try {
+    const existingUser = await Users.getById(id);
+    if (!existingUser) {
+      next({ status: 404, message: `user not found` });
+    } else {
+      req.user = existingUser;
+      next();
+    }
+  } catch (err) {
+    next(err);
+  }
 }
 
 function validateUser(req, res, next) {
   // DO YOUR MAGIC
+  const { name } = req.body;
+  if (!name) {
+    next({ status: 400, message: "missing required name field" });
+  } else {
+    next();
+  }
 }
 
 function validatePost(req, res, next) {
@@ -20,4 +39,6 @@ function validatePost(req, res, next) {
 
 module.exports = {
   logger,
+  validateUserId,
+  validateUser,
 };
