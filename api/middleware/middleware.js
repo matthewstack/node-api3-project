@@ -15,6 +15,7 @@ async function validateUserId(req, res, next) {
       next({ status: 404, message: `user not found` });
     } else {
       req.user = existingUser;
+      console.log(existingUser);
       next();
     }
   } catch (err) {
